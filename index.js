@@ -101,12 +101,17 @@ async function run() {
           email: user.email,
         },
       };
+
       /* 8.9 Set the upsert option to insert a document if no documents match
     the filter */
       const options = { upsert: true };
 
       // 8.10
-      const result = await usersCollection.findOne(filter, updateDoc, options);
+      const result = await usersCollection.updateOne(
+        filter,
+        updateDoc,
+        options
+      );
       res.send(result);
     });
 
