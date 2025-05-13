@@ -51,6 +51,14 @@ async function run() {
       // 5.1 Now in browser url type 'http://localhost:3000/users' to see the data from data base in browser
     });
 
+    // 7.1 to get the specific details we use get method by selecting the id
+    app.get("/users/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }; //query means match with which property in database. findOne() Example from documentation
+      const result = await usersCollection.findOne(query);
+      res.send(result);
+    });
+
     // 4.1 to receive the data create api
     app.post("/users", async (req, res) => {
       // res.send("data in the server");
