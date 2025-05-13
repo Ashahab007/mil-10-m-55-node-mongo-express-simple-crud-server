@@ -84,6 +84,32 @@ async function run() {
       res.send(result);
     });
 
+    // 8.6 creating the put method to get the data from the client side according the documentation https://www.mongodb.com/docs/drivers/node/current/crud/update/
+
+    app.put("/users/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) }; //filter means match with which property in database. same as query we have previously used
+
+      const user = req.body; // as the data is come to body as like as post method
+      console.log(user);
+
+      // 8.8 as per documentation
+      // Specify the update to set a value for the plot field i.e which information going to be updated
+      const updateDoc = {
+        $set: {
+          name: user.name,
+          email: user.email,
+        },
+      };
+      /* 8.9 Set the upsert option to insert a document if no documents match
+    the filter */
+      const options = { upsert: true };
+
+      // 8.10
+      const result = await usersCollection.findOne(filter, updateDoc, options);
+      res.send(result);
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
