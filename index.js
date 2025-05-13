@@ -1,9 +1,11 @@
-// 1.0 creating the server as per documents of express (This was done in previous module 54 ). From 1.0 to 1.1 the between code is done in previous module 54
+// 1.0 creating the server as per documentation of express (This was done in previous module 54 ). Here from steps 1.1 to 1.3 is done in previous module 54.
 
+// 1.1
 const express = require("express");
 const cors = require("cors");
+
 // 3.0 export from  driver => View full code sample from mongodb documentation
-const { MongoClient, ServerApiVersion } = require("mongodb"); // from mongodb documentation
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb"); // from mongodb documentation
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -12,9 +14,11 @@ app.use(cors());
 app.use(express.json());
 
 // user :simpleDBUser, password = JUlcVHbxSwrIZmfr
+
 // 3.1 copy the uri from mongodb documentation and replace <db_password> with password 'JUlcVHbxSwrIZmfr'
 /* const uri =
   "mongodb+srv://simpleDBUser:<db_password>@cluster0.bmunlsr.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"; */ //from mongodb documentation
+
 const uri =
   "mongodb+srv://simpleDBUser:JUlcVHbxSwrIZmfr@cluster0.bmunlsr.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"; //from mongodb documentation
 
@@ -32,6 +36,46 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
+
+    // 4.4 Search in google mongodb crud => CRUD Operations => Insert Documents => insertOne() Example: Full File
+    // Connect to the "userdb" database and access its "movies" collection
+    const database = client.db("usersdb");
+    const usersCollection = database.collection("users");
+
+    // 5.0 my requirement is get the data from the data base and show in ui. go to documentation => find documents => now in code 'Execute query' but didn't match with the video. As i confused so followed the vidoe tutorial which was used toArray().
+
+    app.get("/users", async (req, res) => {
+      const cursor = usersCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+      // 5.1 Now in browser url type 'http://localhost:3000/users' to see the data from data base in browser
+    });
+
+    // 4.1 to receive the data create api
+    app.post("/users", async (req, res) => {
+      // res.send("data in the server");
+      console.log(req.body);
+
+      // 4.5 Insert the defined document into the "usersCollection" collection
+      const newUsers = req.body;
+      const result = await usersCollection.insertOne(newUsers);
+      res.send(result);
+      // 4.6 Now fill the form and see in the console message for "data from the client {acknowledged: true, insertedId: '6822bbcd5a86260b0667ac8c'}". Now add some data from the form and check the mongodb Database => cluster => browse collection => userdb (from left panel) => user. Create data in data base is complete
+    });
+
+    // 6.3 set the delete api
+    app.delete("/users/:id", async (req, res) => {
+      console.log(req.params); // now in running server terminal u will have the id i.e backend is getting the id
+      const id = req.params.id; //req has the property params
+      console.log(id);
+
+      // 6.4 from the documentation of crud mongodb, Delete documents create a query
+      const query = { _id: new ObjectId(id) }; // from the mongodb server we see that _id is in a ObjectId. so created a constructor new ObjectId and set the id.
+      // 6.5 call the deleteOne from the documentation and in this step if u delete the data will delete after refresh.
+      const result = await usersCollection.deleteOne(query);
+      res.send(result);
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
@@ -44,14 +88,15 @@ async function run() {
 }
 run().catch(console.dir);
 
+// 1.2
 app.get("/", (req, res) => {
-  res.send("Simple CRUD running");
+  res.send("Simple CRUD server is running");
 });
 
+// 1.3
 app.listen(port, () => {
-  console.log(`Simple CRUD running on port ${port}`);
+  console.log(`Simple CRUD server is running on port ${port}`);
 });
-// 1.1
 
 // 2.0 Now setup mongoDB, sign up and security => network access => in ip address => edit => Access List => allow access from anywhere => then confirm
 // 2.1 go to cluster =>Database access => Add New Database User
